@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* Base Options */
+    "target": "ES2022", // Modern JS target
+    "module": "NodeNext", // Use Node.js's native ES Module support (required for nodenext resolution)
+    "moduleResolution": "nodenext", // How modules get resolved (aligns with module type)
+    "outDir": "./dist", // Output directory for compiled JS
+    "rootDir": "./src", // Root directory of source TS files
+    "sourceMap": true, // Generate source maps for debugging
+    "declaration": true, // Generate corresponding '.d.ts' files
+
+    /* Strict Type-Checking Options */
+    "strict": true, // Enable all strict type-checking options
+    // "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type. (Included in 'strict')
+    // "strictNullChecks": true, // Enable strict null checks. (Included in 'strict')
+    // "strictFunctionTypes": true, // Enable strict checking of function types. (Included in 'strict')
+    // "strictBindCallApply": true, // Enable strict 'bind', 'call', and 'apply' methods on functions. (Included in 'strict')
+    // "strictPropertyInitialization": true, // Ensure non-undefined class properties are initialized in the constructor. (Included in 'strict')
+    // "noImplicitThis": true, // Raise error on 'this' expressions with an implied 'any' type. (Included in 'strict')
+    // "alwaysStrict": true, // Parse in strict mode and emit "use strict" for each source file. (Included in 'strict')
+
+    /* Module Resolution Options */
+    "esModuleInterop": true, // Enables compatibility with CommonJS modules
+    "resolveJsonModule": true, // Allows importing JSON files
+
+    /* Advanced Options */
+    "skipLibCheck": true, // Skip type checking of declaration files (*.d.ts)
+    "forceConsistentCasingInFileNames": true // Disallow inconsistently-cased references to the same file.
+  },
+  "include": ["src/**/*"], // Which files TypeScript should compile
+  "exclude": ["node_modules", "dist"] // Which files/folders TypeScript should ignore
+}
