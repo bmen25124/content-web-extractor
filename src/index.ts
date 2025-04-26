@@ -92,11 +92,52 @@ const cleanHtml = (htmlContent: string): string => {
 // Add the content extraction tool
 server.tool(
     "extract-content",
-    { url: z.string().url() }, // Validate input as a URL string
+    "Extracts the main textual content from a given URL. It fetches the HTML content of the URL, attempts to isolate the primary article or main body by removing common boilerplate elements (headers, footers, navs, ads, etc.), converts the cleaned HTML to Markdown format, and returns the result as plain text.",
+    { url: z.string().url("The URL must be a valid HTTP or HTTPS web address.").describe("The publicly accessible HTTP or HTTPS URL of the web page to extract content from.") },
     async ({ url }) => {
         try {
+            // Validate URL protocol
+            let parsedUrl;
+            try {
+                parsedUrl = new URL(url);
+                if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+                    console.error(`Invalid protocol: ${parsedUrl.protocol} for URL: ${url}`);
+                    return {
+                        content: [{ type: "text", text: `Error: URL must use HTTP or HTTPS protocol.` }],
+                        isError: true
+                    };
+                }
+            } catch (e) {
+                // This should theoretically not happen due to Zod validation, but catch just in case
+                console.error(`Error parsing URL ${url}:`, e);
+                return {
+                    content: [{ type: "text", text: `Error: Invalid URL format.` }],
+                    isError: true
+                };
+            }
+
             console.log(`Fetching content from: ${url}`);
-            const response = await fetch(url);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+            let response;
+            try {
+                response = await fetch(url, { signal: controller.signal });
+            } catch (fetchError: any) {
+                clearTimeout(timeoutId); // Clear timeout if fetch fails for other reasons
+                if (fetchError.name === 'AbortError') {
+                    console.error(`Fetch timed out for ${url}`);
+                    return {
+                        content: [{ type: "text", text: `Error: Request timed out fetching URL.` }],
+                        isError: true
+                    };
+                }
+                // Re-throw other fetch errors to be caught by the main catch block
+                throw fetchError;
+            } finally {
+                clearTimeout(timeoutId); // Always clear timeout after fetch completes or fails
+            }
+
 
             if (!response.ok) {
                 console.error(`HTTP error! status: ${response.status} for ${url}`);
@@ -123,9 +164,25 @@ server.tool(
             const cleanedHtml = cleanHtml(htmlContent);
             console.log(`HTML cleaned (${Math.round(cleanedHtml.length / 1024)} KB) for: ${url}`);
 
+            // Add validation for empty content after cleaning
+            if (!cleanedHtml || cleanedHtml.trim().length === 0) {
+                console.warn(`Cleaning resulted in empty HTML content for: ${url}`);
+                return {
+                    content: [{ type: "text", text: "Warning: Extracted content is empty after cleaning HTML." }]
+                };
+            }
+
             console.log(`Converting cleaned HTML to Markdown for: ${url}`);
             const markdownContent = turndownService.turndown(cleanedHtml);
             console.log(`Converted to Markdown (${Math.round(markdownContent.length / 1024)} KB) for: ${url}`);
+
+            // Add validation for empty content after cleaning and conversion
+            if (!markdownContent || markdownContent.trim().length === 0) {
+                console.warn(`Extraction resulted in empty content for: ${url}`);
+                return {
+                    content: [{ type: "text", text: "Warning: Extracted content is empty after cleaning and conversion." }]
+                };
+            }
 
             return {
                 content: [{ type: "text", text: markdownContent }] // Return as text, client can interpret as Markdown
