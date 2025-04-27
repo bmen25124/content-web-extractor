@@ -9,7 +9,7 @@ import TurndownService from 'turndown';
 // Create an MCP server
 const server = new McpServer({
     name: "ContentExtractor",
-    version: "1.0.0"
+    version: "1.0.1"
 });
 
 // Initialize Turndown service for HTML to Markdown conversion
