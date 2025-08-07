@@ -25,21 +25,23 @@ const cleanHtml = (htmlContent: string): string => {
 
     // Try standard content containers first
     const contentSelectors = [
-        "main",             // HTML5 semantic main content
-        "article",          // HTML5 semantic article
-        '[role="main"]',    // ARIA main content role
-        "#content",         // Common content ID
-        ".content",         // Common content class
-        ".main",            // Common main class
-        ".post",            // Blog post content
-        ".article",         // Article content container
+        "article",
+        "#article",
+        ".article",
+        "main",
+        "#main",
+        ".main",
+        '[role="main"]',
+        "#content",
+        ".content",
+        ".post",
     ];
 
     let $content = $(); // Initialize an empty Cheerio object
 
     for (const selector of contentSelectors) {
         const selected = $(selector);
-        if (selected.length > 0) {
+        if (selected.length === 1) {
             $content = selected.first(); // Use the first match
             break;
         }

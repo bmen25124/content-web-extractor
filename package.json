@@ -1,6 +1,6 @@
 {
   "name": "content-web-extractor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "MCP server for extracting content from web pages",
   "type": "module",
   "main": "dist/index.js",
