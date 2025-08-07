@@ -94,7 +94,7 @@ const cleanHtml = (htmlContent: string): string => {
 // Add the content extraction tool
 server.tool(
     "extract-content",
-    "Extracts the main textual content from a given URL. It fetches the HTML content of the URL, attempts to isolate the primary article or main body by removing common boilerplate elements (headers, footers, navs, ads, etc.), converts the cleaned HTML to Markdown format, and returns the result as plain text.",
+    "Extracts the main textual content from a given URL, converts it to Markdown, and returns the result.",
     { url: z.string().url("The URL must be a valid HTTP or HTTPS web address.").describe("The publicly accessible HTTP or HTTPS URL of the web page to extract content from.") },
     async ({ url }) => {
         try {
